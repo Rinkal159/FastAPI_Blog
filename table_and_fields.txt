@@ -1,0 +1,19 @@
+* user
+* ----
+
+id
+name
+email
+password
+profile picture url - optional - default (some picture url)
+bio - optinal - default (null)
+
+* blogs
+* -----
+
+id
+title
+content
+author_id
+posted_at
+updated_at
