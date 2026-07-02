@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<article class="content-section py-3 px-4 mb-4">
+  <div class="d-flex flex-column align-items-center gap-2">
+
+    <h1 class="text-danger">{{status_code}}</h1>
+    <h4>{{error_message}}</h4>
+  </div>
+</article>
+{% endblock %}
