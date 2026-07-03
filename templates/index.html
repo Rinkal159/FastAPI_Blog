@@ -1,25 +1,30 @@
 {% extends "layout.html" %}
 {% block body %}
+{% if blogs|length == 0 %}
+<article class="py-3 px-4 mb-4 text-center">
+  <h4>No blogs to show</h4>
+</article>
+{% else %}
 {% for blog in blogs %}
 <article class="content-section py-3 px-4 mb-4">
   <div class="d-flex align-items-start gap-4">
 
     <!-- profile picture -->
-    <img class="rounded-circle article-img flex-shrink-0" src="{{url_for('static', path='profile_pics/default.jpg')}}"
-      alt="{{ blog.author }}'s profile picture" width="64" height="64" loading="lazy">
+    <img class="rounded-circle article-img flex-shrink-0" src="/{{blog.author.profile_picture_path}}"
+      alt="{{ blog.author.name }}'s profile picture" width="64" height="64" loading="lazy">
 
 
     <div class="flex-grow-1">
 
       <!-- author and date posted -->
-      <div class="article-metadata mb-4">
-        <a class="me-2" href="#">{{ blog.author }}</a>
-        <small class="text-body-secondary">{{ blog.posted_at }}</small>
+      <div class="article-metadata mb-2">
+        <a class="me-2" href="{{url_for('get_individual_blogs', id=blog.author_id)}}">{{ blog.author.name }}</a>
+        <small class="text-body-secondary">{{ blog.posted_at.strftime("%B %d, %Y") }}</small>
       </div>
 
       <!-- title -->
       <h2 class="mb-2">
-        <a class="article-title" href="">{{ blog.title }}</a>
+        <a class="article-title" href="{{url_for('blog', id=blog.id)}}">{{ blog.title }}</a>
       </h2>
 
       <!-- content -->
@@ -29,4 +34,5 @@
   </div>
 </article>
 {% endfor %}
+{% endif %}
 {% endblock %}
