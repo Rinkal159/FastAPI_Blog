@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block body %}
+<h2 class="mb-4">Blogs by <span class="fst-italic">{{name}}</span></h2>
+{% for blog in blogs %}
+<article class="content-section py-3 px-4 mb-4">
+  <div class="d-flex align-items-start gap-4">
+
+    <!-- profile picture -->
+    <img class="rounded-circle article-img flex-shrink-0" src="/{{blog.author.profile_picture_path}}"
+      alt="{{ blog.author.name }}'s profile picture" width="64" height="64" loading="lazy">
+
+
+    <div class="flex-grow-1">
+
+      <!-- author and date posted -->
+      <div class="article-metadata mb-2">
+        <a class="me-2" href="#">{{ blog.author.name }}</a>
+        <small class="text-body-secondary">{{ blog.posted_at.strftime("%B %d, %Y") }}</small>
+      </div>
+
+      <!-- title -->
+      <h2 class="mb-2">
+        <a class="article-title" href="{{url_for('blog', id=blog.id)}}">{{ blog.title }}</a>
+      </h2>
+
+      <!-- content -->
+      <p class="article-content">{{ blog.content }}</p>
+
+    </div>
+  </div>
+</article>
+{% endfor %}
+{% endblock %}
