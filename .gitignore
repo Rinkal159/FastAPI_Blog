@@ -3,3 +3,4 @@ env_config.py
 .venv
 *__pycache__
 *__init__.py
+*settings.json
