@@ -10,6 +10,11 @@ class Base(BaseModel):
 class BlogCreate(Base):
     title: Annotated[str, Field(min_length=1, max_length=100)]
     content: Annotated[str, Field(min_length=10, max_length=1500)]
+    
+
+class BlogUpdate(Base):
+    title: str | None = None
+    content: str | None = None
 
 
 class AuthorDetail(Base):
