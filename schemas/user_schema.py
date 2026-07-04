@@ -13,6 +13,12 @@ class UserCreate(Base):
     password: Annotated[str, Field(min_length=8)]
     bio: Annotated[str | None, Field(max_length=1500)] = None
     profile_picture: str | None = None
+    
+    
+class UserUpdate(Base):
+    name: str | None = None
+    bio: str | None = None
+    profile_picture: str | None = None
 
 
 # inherited from UserCreate
@@ -21,6 +27,7 @@ class UserResponse(Base):
     email: str
     bio: str | None
     profile_picture: str | None
+    profile_picture_path: str
     created_at: datetime
     updated_at: datetime
 
