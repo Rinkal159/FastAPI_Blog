@@ -30,7 +30,7 @@ async def get_user_api(
 
 # * update user
 @user_router.patch("/", response_model=UserResponseSchema)
-async def update_user(
+async def update_user_api(
     user: UserUpdateSchema,
     db: AsyncSession = Depends(get_db),
     current_user_id=Depends(get_current_user),
@@ -49,7 +49,7 @@ async def update_user(
 
 # * delete user
 @user_router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(
+async def delete_user_api(
     db: AsyncSession = Depends(get_db), current_user_id=Depends(get_current_user)
 ):
     result = await db.execute(select(User).where(User.id == current_user_id))

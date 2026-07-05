@@ -42,7 +42,7 @@ async def create_user_api(user: UserCreateSchema, db: AsyncSession = Depends(get
 
 # * login
 @auth_router.post("/login")
-async def login(
+async def login_api(
     user: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(select(User).where(User.email == user.username))
