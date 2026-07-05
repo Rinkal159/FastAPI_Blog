@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 
 def handlers(app: FastAPI, templates):
     @app.exception_handler(StarletteException)
-    def exception_anything(request: Request, exception: StarletteException):
+    async def exception_anything(request: Request, exception: StarletteException):
         # back-end response
         if request.url.path.startswith("/api"):
             return JSONResponse(
@@ -22,7 +22,7 @@ def handlers(app: FastAPI, templates):
 
 
     @app.exception_handler(RequestValidationError)
-    def exception_422(request: Request, exception: RequestValidationError):
+    async def exception_422(request: Request, exception: RequestValidationError):
 
         # back-end response
         if request.url.path.startswith("/api"):
