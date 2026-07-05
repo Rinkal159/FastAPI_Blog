@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from auth.authentication import get_current_user
-from sqlalchemy import select
+from sqlalchemy import select, and_
 
 from model import Blog
 from schemas.blog_schema import (
@@ -14,12 +14,22 @@ from schemas.blog_schema import (
 blog_router = APIRouter(prefix="/api/blogs", tags=["Blogs"])
 
 
-# * get all the blogs
+# * get all the blogs - pagination applied
 @blog_router.get("/", response_model=list[BlogResponseSchema])
 async def get_blogs_api(
-    db: AsyncSession = Depends(get_db), current_user_id=Depends(get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user_id=Depends(get_current_user),
+    limit: int = 5,
+    page: int = 1,
+    title: str = "",
+    content: str = "",
 ):
-    result = await db.execute(select(Blog))
+    result = await db.execute(
+        select(Blog)
+        .where(and_(Blog.title.ilike(f"%{title}%"), Blog.content.ilike(f"%{content}%")))
+        .offset(limit * (page - 1))
+        .limit(limit)
+    )
     return result.scalars().all()
 
 
@@ -71,7 +81,7 @@ async def create_post_api(
 
 # * update blog
 @blog_router.patch("/{post_id}", response_model=BlogResponseSchema)
-async def update_blog(
+async def update_blog_api(
     post_id: int,
     post: BlogUpdateSchema,
     db: AsyncSession = Depends(get_db),
@@ -102,7 +112,7 @@ async def update_blog(
 
 # * delete blog
 @blog_router.delete("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_blog(
+async def delete_blog_api(
     post_id: int,
     db: AsyncSession = Depends(get_db),
     current_user_id=Depends(get_current_user),
