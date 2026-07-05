@@ -3,15 +3,16 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 from exception_handling.exception_handlers import handlers
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from database import get_db
 from auth.authentication import get_current_user
+from model import lifespan
 
 from model import User, Blog
-
 from routers import auth_routers, blog_routers, user_routers
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/media", StaticFiles(directory="media"), name="media")
@@ -23,8 +24,9 @@ templates = Jinja2Templates(directory="templates")
 # get all the posts
 @app.get("/", include_in_schema=False, name="home")
 @app.get("/blogs", include_in_schema=False, name="blogs")
-def home(request: Request, db: Session = Depends(get_db)):
-    blogs = db.query(Blog).all()
+async def home(request: Request, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Blog))
+    blogs = result.scalars().all()
     return templates.TemplateResponse(
         request, "index.html", {"blogs": blogs, "title": "Index"}
     )
@@ -32,27 +34,36 @@ def home(request: Request, db: Session = Depends(get_db)):
 
 # get specific post
 @app.get("/blogs/{id}", include_in_schema=False)
-def blog(id: int, request: Request, db: Session = Depends(get_db)):
-    blogs = db.query(Blog).all()
-    for blog in blogs:
-        if blog.id == id:
-            return templates.TemplateResponse(
-                request, "blog.html", {"blog": blog, "title": blog.title[:50]}
-            )
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found")
+async def blog(id: int, request: Request, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Blog).where(Blog.id == id))
+    existed_blog = result.scalars().one_or_none()
+
+    if not existed_blog:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found"
+        )
+
+    return templates.TemplateResponse(
+        request, "blog.html", {"blog": existed_blog, "title": existed_blog.title[:50]}
+    )
 
 
 # get all blogs of a user
 @app.get("/blogs/individual/{id}")
-def get_individual_blogs(request: Request, id: int, db: Session = Depends(get_db)):
-    existed_user = db.query(User).filter(User.id == id).one_or_none()
+async def get_individual_blogs(
+    request: Request, id: int, db: AsyncSession = Depends(get_db)
+):
+    result_user = await db.execute(select(User).where(User.id == id))
+    existed_user = result_user.scalars().one_or_none()
 
     if not existed_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Author not found"
         )
 
-    blogs = db.query(Blog).filter(Blog.author_id == id).all()
+    result_blogs = await db.execute(select(Blog).where(Blog.author_id == id))
+    blogs = result_blogs.scalars().all()
+
     name = blogs[0].author.name
     return templates.TemplateResponse(
         request,
