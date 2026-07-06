@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 from database import get_db
 from utils.password_hashing import hash_password, verify_password
 from fastapi.security import OAuth2PasswordRequestForm
@@ -22,7 +22,9 @@ auth_router = APIRouter(prefix="/api/auth", tags=["Auth"])
     status_code=status.HTTP_201_CREATED,
 )
 async def create_user_api(user: UserCreateSchema, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.email == user.email))
+    user.email = user.email.lower()
+    
+    result = await db.execute(select(User).where(func.lower(User.email) == user.email))
     existed_user = result.scalars().one_or_none()
 
     # user already exists
@@ -45,7 +47,7 @@ async def create_user_api(user: UserCreateSchema, db: AsyncSession = Depends(get
 async def login_api(
     user: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(User).where(User.email == user.username))
+    result = await db.execute(select(User).where(func.lower(User.email) == user.username.lower()))
     existed_user = result.scalars().one_or_none()
 
     # user doesn't exist or password is'nt matching
