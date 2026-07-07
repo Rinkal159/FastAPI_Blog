@@ -72,7 +72,7 @@
           aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        
+
         <div class="collapse navbar-collapse" id="navbarToggle">
           <div class="navbar-nav me-auto">
             <a class="nav-link active" aria-current="page" href="{{url_for('home')}}">Home</a>
@@ -80,8 +80,22 @@
 
           <!-- Navbar Right Side -->
           <div class="navbar-nav">
-            <a class="btn btn-outline-light mb-2 mb-md-0 me-md-2" href="#">Login</a>
-            <a class="btn btn-light mb-2 mb-md-0 me-md-3" href="#">Register</a>
+
+            {% if user %}
+            
+            <!-- new blog -->
+            <button type="button" class="btn btn-light me-md-2" data-bs-toggle="modal" data-bs-target="#BlogCreateModal">New Blog</button>
+            <!-- logout -->
+            <a class="btn btn-outline-light mb-2 mb-md-0 me-md-2" href="{{url_for('logout_api')}}">Logout</a>
+
+            {% else %}
+
+            <!-- login -->
+            <a class="btn btn-outline-light mb-2 mb-md-0 me-md-2" href="{{url_for('login')}}">Login</a>
+            <!-- signup -->
+            <a class="btn btn-light mb-2 mb-md-0 me-md-3" href="{{url_for('signup')}}">Signup</a>
+
+            {% endif %}
 
             <!-- theme -->
             <div class="nav-item dropdown">
@@ -136,6 +150,78 @@
     </div>
   </footer>
 
+
+  <!-- Blog Create Modal -->
+  <div class="modal fade" id="BlogCreateModal" tabindex="-1" aria-labelledby="BlogCreateModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="BlogCreateModalLabel">Create Blog</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="BlogCreateForm">
+            <!-- title -->
+            <div class="mb-3">
+              <label for="title" class="form-label">Title<span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="title" name="title" required autocomplete="off">
+            </div>
+
+
+            <!-- content -->
+            <div class="mb-3">
+              <label for="content" class="form-label">Content<span class="text-danger">*</span></label>
+              <textarea class="form-control" name="content" id="content" rows="10"
+                placeholder="Type your content here..."></textarea>
+            </div>
+
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Create Blog</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Success modal -->
+  <div class="modal fade" id="SuccessModal" tabindex="-1" aria-labelledby="SuccessModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-success">
+          <h1 class="modal-title fs-5" id="SuccessModalLabel">Modal title</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="SuccessModalBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Error modal -->
+  <div class="modal fade" id="ErrorModal" tabindex="-1" aria-labelledby="ErrorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger">
+          <h1 class="modal-title fs-5" id="ErrorModalLabel">Modal title</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="ErrorModalBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
   <!-- Set the current year in the footer -->
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 
@@ -168,6 +254,11 @@
     // Initialize
     setTheme(localStorage.getItem('theme') || 'auto');
   </script>
+
+
+  {% block script %}
+  {% endblock %}
+
 </body>
 
 </html>
