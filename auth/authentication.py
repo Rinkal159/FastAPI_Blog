@@ -1,10 +1,9 @@
 from jose import jwt, JWTError, ExpiredSignatureError
 from datetime import datetime, UTC, timedelta
 from env_config import settings
-from fastapi import HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import status, Cookie
+from utils.exception import raise_exception
 
-oauth2_schema = OAuth2PasswordBearer(tokenUrl="login")
 
 def create_token(data: dict) -> str :
     payload = data.copy()
@@ -15,25 +14,26 @@ def create_token(data: dict) -> str :
     return token
 
 
-def verify_token(token: str, credentials_exception) -> int :
+def verify_token(token: str) -> int :
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-        if not payload:
-            raise credentials_exception
-
+        
         user_id = payload.get("id")
+        
         if not user_id:
-            raise credentials_exception
+            raise raise_exception(status.HTTP_401_UNAUTHORIZED, "Invalid token")
         
     except ExpiredSignatureError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired. Please log in again")
+        raise raise_exception(status.HTTP_401_UNAUTHORIZED, "Session is expired. Please log in again.")
         
     except JWTError:
-        raise credentials_exception
+        raise raise_exception(status.HTTP_401_UNAUTHORIZED, "Invalid token")
+    
     
     return user_id
 
-def get_current_user(token: str = Depends(oauth2_schema)):
-    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-    
-    return verify_token(token, credentials_exception)
+def get_current_user(access_token: str | None = Cookie(None)):
+    if access_token is None:
+            raise raise_exception(status.HTTP_401_UNAUTHORIZED, "Session is expired. Please log in again.")
+        
+    return verify_token(access_token)
