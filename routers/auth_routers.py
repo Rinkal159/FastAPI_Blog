@@ -5,6 +5,7 @@ from database import get_db
 from utils.password_hashing import hash_password, verify_password
 from fastapi.security import OAuth2PasswordRequestForm
 from auth.authentication import create_token
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from model import User
 from schemas.user_schema import (
@@ -58,5 +59,30 @@ async def login_api(
 
     # creating a token
     token = create_token({"id": existed_user.id})
+    
+    response = JSONResponse({
+        "message" : "Login successful"
+    })
+    
+    # wrapping token inside a cookie and send it to the browser
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=3600
+    )
 
-    return {"access_token": token, "token_type": "bearer"}
+    return response
+
+
+
+# Logout
+@auth_router.get("/logout")
+def logout_api():
+    response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    response.delete_cookie(key="access_token", httponly=True, secure=False, samesite="lax")
+    
+    return response
