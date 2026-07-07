@@ -1,0 +1,11 @@
+import bootstrap from "bootstrap"
+
+export const hideModal = (modalId) => {
+    const modal = bootstrap.Modal.getOrCreateInstance(
+        document.getElementById(modalId)
+    )
+
+    if (modal) {
+        modal.hide()
+    }
+}
