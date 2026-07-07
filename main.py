@@ -6,10 +6,12 @@ from exception_handling.exception_handlers import handlers
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from database import get_db
-from auth.authentication import get_current_user
 from model import lifespan
+from auth.authentication import verify_token, get_current_user
+from utils.user_In_response import user_in_response
 
 from model import User, Blog
+from schemas.user_schema import UserCreate as UserCreateSchema
 from routers import auth_routers, blog_routers, user_routers
 
 app = FastAPI(lifespan=lifespan)
@@ -27,8 +29,12 @@ templates = Jinja2Templates(directory="templates")
 async def home(request: Request, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Blog))
     blogs = result.scalars().all()
+    
+    user = await user_in_response(request, db)
+    print(user)
+        
     return templates.TemplateResponse(
-        request, "index.html", {"blogs": blogs, "title": "Index"}
+        request, "index.html", {"blogs": blogs, "title": "Index", "user" : user}
     )
 
 
@@ -70,6 +76,20 @@ async def get_individual_blogs(
         "individual_blogs.html",
         {"blogs": blogs, "name": name, "title": f"Posts by {name[:50]}"},
     )
+
+
+# register
+@app.get("/signup", include_in_schema=False)
+def signup(request: Request):
+    print("SIGNUP")
+    return templates.TemplateResponse(request, "signup.html", {"title" : "Signup"})
+
+
+# login
+@app.get("/login", include_in_schema=False)
+def login(request: Request):
+    return templates.TemplateResponse(request, "login.html", {"title" : "Login"})
+
 
 
 # * BACK-END
