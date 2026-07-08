@@ -23,9 +23,74 @@
       </h2>
 
       <!-- content -->
-      <p class="article-content">{{ blog.content }}</p>
+      <p class="article-content-individual">{{ blog.content }}</p>
+
+      <!-- Edit & Delete buttons -->
+      {% if user.id == blog.author_id %}
+      <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#EditBlogModal">Edit</button>
+      <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#DeleteBlogModal">delete</button>
+      {% endif %}
 
     </div>
   </div>
 </article>
+
+<!-- Edit Blog Modal -->
+<div class="modal fade" id="EditBlogModal" tabindex="-1" aria-labelledby="EditBlogModalLabel" aria-hidden="true"
+  data-bs-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="EditBlogModalLabel">Edit Blog</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="EditBlogModalForm" class="d-flex flex-column ">
+          <!-- blog id -->
+          <input type="hidden" name="post_id" value="{{blog.id}}">
+
+          <!-- title -->
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" autocomplete="off" value="{{blog.title}}">
+          </div>
+
+
+          <!-- content -->
+          <div class="mb-3">
+            <label for="content" class="form-label">Content</label>
+            <textarea class="form-control" name="content" id="content" rows="10"
+              placeholder="Type your content here...">{{blog.content}}</textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary align-self-end">Edit Blog</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete blog modal -->
+<div class="modal fade" id="DeleteBlogModal" tabindex="-1" aria-labelledby="DeleteBlogModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h1 class="modal-title fs-5" id="DeleteBlogModalLabel">Delete</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="DeleteBlogModalBody">Are you sure you want to Delete this blog?</div>
+      <span class="d-none" id="post_id">{{blog.id}}</span>
+      <span class="d-none" id="blog_title">{{blog.title}}</span>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button id="delete" type="button" class="btn btn-outline-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="module" src="/static/controllers/deletePost.js"></script>
+<script type="module" src="/static/controllers/updatePost.js"></script>
 {% endblock %}
