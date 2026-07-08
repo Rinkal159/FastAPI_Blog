@@ -63,7 +63,6 @@
 
 <body class="d-flex flex-column min-vh-100">
   <header class="site-header">
-
     <!-- navbar -->
     <nav class="navbar navbar-expand-md bg-steel fixed-top" data-bs-theme="dark">
       <div class="container">
@@ -79,19 +78,24 @@
           </div>
 
           <!-- Navbar Right Side -->
-          <div class="navbar-nav">
+          <div class="navbar-nav d-flex align-items-center gap-1.5 ">
 
             {% if user %}
-            
+
             <!-- new blog -->
-            <button type="button" class="btn btn-light me-md-2" data-bs-toggle="modal" data-bs-target="#BlogCreateModal">New Blog</button>
+            <button type="button" class="btn btn-light me-md-2" data-bs-toggle="modal"
+              data-bs-target="#BlogCreateModal">New Blog</button>
+
             <!-- logout -->
-            <a class="btn btn-outline-light mb-2 mb-md-0 me-md-2" href="{{url_for('logout_api')}}">Logout</a>
+            <button type="button" class="btn btn-outline-light mb-2 mb-md-0 me-md-3" data-bs-toggle="modal"
+              data-bs-target="#LogoutModal">Logout</button>
+            <img class="rounded-circle navbar-img" src={{user.profile_picture_path}} alt={{user.name}}>
 
             {% else %}
 
             <!-- login -->
             <a class="btn btn-outline-light mb-2 mb-md-0 me-md-2" href="{{url_for('login')}}">Login</a>
+
             <!-- signup -->
             <a class="btn btn-light mb-2 mb-md-0 me-md-3" href="{{url_for('signup')}}">Signup</a>
 
@@ -124,10 +128,10 @@
   <!-- main -->
   <main role="main" class="container">
     <div class="row">
-      <div class="col-md-8">
+      <div class="col-md-10 mx-auto">
         {% block body %}{% endblock body %}
       </div>
-      <aside class="col-md-4">
+      <!-- <aside class="col-md-4">
         <div class="content-section py-5 px-4 mb-4">
           <h3>Our Sidebar</h3>
           <p class="text-body-secondary">You can put any information here you'd like.</p>
@@ -138,10 +142,11 @@
             <li class="list-group-item">etc</li>
           </ul>
         </div>
-      </aside>
+      </aside> -->
     </div>
   </main>
 
+  <!-- footer -->
   <footer class="mt-auto py-3 bg-body-tertiary border-top">
     <div class="container text-center">
       <p class="text-body-secondary mb-0">
@@ -150,9 +155,9 @@
     </div>
   </footer>
 
-
-  <!-- Blog Create Modal -->
-  <div class="modal fade" id="BlogCreateModal" tabindex="-1" aria-labelledby="BlogCreateModalLabel" aria-hidden="true" data-bs-backdrop="static">
+  <!-- Create Blog Modal -->
+  <div class="modal fade" id="BlogCreateModal" tabindex="-1" aria-labelledby="BlogCreateModalLabel" aria-hidden="true"
+    data-bs-backdrop="static">
     <div class="modal-dialog modal-md">
       <div class="modal-content">
         <div class="modal-header">
@@ -160,7 +165,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="BlogCreateForm">
+          <form id="BlogCreateForm" class="d-flex flex-column ">
             <!-- title -->
             <div class="mb-3">
               <label for="title" class="form-label">Title<span class="text-danger">*</span></label>
@@ -175,24 +180,37 @@
                 placeholder="Type your content here..."></textarea>
             </div>
 
+            <button type="submit" class="btn btn-primary align-self-end">Create Blog</button>
           </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Create Blog</button>
         </div>
       </div>
     </div>
   </div>
 
-
+  <!-- Logout modal -->
+  <div class="modal fade" id="LogoutModal" tabindex="-1" aria-labelledby="LogoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger">
+          <h1 class="modal-title fs-5" id="LogoutModalLabel">Logout</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="LogoutModalBody">Are you sure you want to logout?</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-outline-danger"
+            onclick="window.location.href='{{ url_for('logout_api') }}'">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Success modal -->
   <div class="modal fade" id="SuccessModal" tabindex="-1" aria-labelledby="SuccessModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header bg-success">
-          <h1 class="modal-title fs-5" id="SuccessModalLabel">Modal title</h1>
+          <h1 class="modal-title fs-5" id="SuccessModalLabel">Success</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="SuccessModalBody"></div>
@@ -203,13 +221,12 @@
     </div>
   </div>
 
-
   <!-- Error modal -->
   <div class="modal fade" id="ErrorModal" tabindex="-1" aria-labelledby="ErrorModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header bg-danger">
-          <h1 class="modal-title fs-5" id="ErrorModalLabel">Modal title</h1>
+          <h1 class="modal-title fs-5" id="ErrorModalLabel">Error</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="ErrorModalBody"></div>
@@ -219,8 +236,6 @@
       </div>
     </div>
   </div>
-
-
 
   <!-- Set the current year in the footer -->
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
@@ -255,6 +270,8 @@
     setTheme(localStorage.getItem('theme') || 'auto');
   </script>
 
+  <!-- create a post -->
+  <script type="module" src="/static/controllers/createPost.js"></script>
 
   {% block script %}
   {% endblock %}
