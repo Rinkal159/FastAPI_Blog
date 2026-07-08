@@ -1,6 +1,4 @@
-import bootstrap from "bootstrap"
-
-export const hideModal = (modalId) => {
+export default function hideModal(modalId) {
     const modal = bootstrap.Modal.getOrCreateInstance(
         document.getElementById(modalId)
     )
