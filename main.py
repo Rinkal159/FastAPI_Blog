@@ -27,11 +27,10 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", include_in_schema=False, name="home")
 @app.get("/blogs", include_in_schema=False, name="blogs")
 async def home(request: Request, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Blog))
+    result = await db.execute(select(Blog).order_by(Blog.updated_at.desc()))
     blogs = result.scalars().all()
     
     user = await user_in_response(request, db)
-    print(user)
         
     return templates.TemplateResponse(
         request, "index.html", {"blogs": blogs, "title": "Index", "user" : user}
@@ -48,9 +47,11 @@ async def blog(id: int, request: Request, db: AsyncSession = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found"
         )
+        
+    user = await user_in_response(request, db)
 
     return templates.TemplateResponse(
-        request, "blog.html", {"blog": existed_blog, "title": existed_blog.title[:50]}
+        request, "blog.html", {"blog": existed_blog, "title": existed_blog.title[:50], "user" : user}
     )
 
 
@@ -67,14 +68,16 @@ async def get_individual_blogs(
             status_code=status.HTTP_404_NOT_FOUND, detail="Author not found"
         )
 
-    result_blogs = await db.execute(select(Blog).where(Blog.author_id == id))
+    result_blogs = await db.execute(select(Blog).where(Blog.author_id == id).order_by(Blog.updated_at.desc()))
     blogs = result_blogs.scalars().all()
+    
+    user = await user_in_response(request, db)
 
     name = blogs[0].author.name
     return templates.TemplateResponse(
         request,
         "individual_blogs.html",
-        {"blogs": blogs, "name": name, "title": f"Posts by {name[:50]}"},
+        {"blogs": blogs, "name": name, "title": f"Posts by {name[:50]}", "user" : user},
     )
 
 
