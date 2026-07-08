@@ -13,6 +13,8 @@ async def user_in_response(request: Request, db: AsyncSession = Depends(get_db))
     user_id = verify_token(token)
     user = None
     if user_id:
-        user = await db.execute(select(User).where(User.id == user_id))
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalars().one_or_none()
+        
         
     return user
