@@ -5,6 +5,10 @@ const password = document.getElementById("password")
 const confirmPassword = document.getElementById("confirmPassword")
 const passwordError = document.getElementById("passwordError")
 const name = document.getElementById("name")
+const profilePicture = document.getElementById("profilePicture")
+const previewImage = document.getElementById("previewImage")
+
+console.log("HELLO");
 
 // live checking
 confirmPassword.addEventListener("keyup", () => {
@@ -12,6 +16,17 @@ confirmPassword.addEventListener("keyup", () => {
         passwordError.classList.remove("d-none")
     } else {
         passwordError.classList.add("d-none")
+    }
+})
+
+
+// live profile picture preview
+profilePicture.addEventListener("change", () => {
+
+    picture = profilePicture.files[0];
+
+    if (picture) {
+        previewImage.src = URL.createObjectURL(picture)
     }
 })
 
@@ -24,6 +39,7 @@ form.addEventListener("submit", async (e) => {
         if (password.value != confirmPassword.value) {
             throw new Error("Password and Confirm Password do not match")
         }
+
 
         const formData = new FormData(form)
         const userData = {
