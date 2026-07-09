@@ -28,6 +28,8 @@
   --account-img-size: 7.813rem;
   /* 125px converted to rem */
   --navbar-img-size: 3rem;
+
+
 }
 
 /* Base Styles */
@@ -65,6 +67,112 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
+
+
+/* navbar */
+.navbar-img {
+  width: var(--navbar-img-size);
+  height: var(--navbar-img-size);
+  object-fit: cover;
+  cursor: pointer;
+  border-radius: 100%;
+}
+
+.nav-search {
+  padding: .4rem 1rem;
+  width: 25rem;
+  background-color: rgb(231, 231, 231);
+  color: black;
+  border: none;
+  box-shadow: 0 0 0 1px rgb(240, 240, 240);
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+
+  transition: .2s ease-out;
+}
+
+.nav-search:focus {
+  outline: none;
+  box-shadow: 2px 2px 6px rgba(44, 44, 44, 0.778);
+}
+
+.nav-search:focus~.btn-search {
+  box-shadow: 1px 1px 3px black;
+}
+
+.btn-search {
+  background-color: rgb(67, 67, 67);
+  border: none;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  padding: .3rem .6rem;
+  box-shadow: 0 0 0 1px white;
+  transition: .2s ease-out;
+
+}
+
+.searched-div {
+  margin: 1rem 0rem 2rem;
+  box-shadow: 0 0 0 .6px white;
+  display: inline-block;
+  border-radius: 5px;
+}
+
+.searched-query,
+.searched-cancel {
+  padding: .6rem 1rem;
+  margin: 0;
+  font-size: 1.2rem;
+  border: none;
+}
+
+.searched-query {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.searched-cancel {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  transition: .2s ease-out;
+  padding: .6rem .8rem;
+}
+
+.searched-cancel:hover {
+  background-color: rgb(199, 79, 79);
+}
+
+
+/* profile */
+.profile-values {
+  cursor: not-allowed;
+}
+
+.profile {
+  padding-top:2rem;
+  margin-bottom: 5rem;
+}
+
+.profile-section-headings {
+  margin-bottom: 2rem;
+}
+
+/* profile picture */
+.profile-picture-div {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+.img-preview {
+  width: 180px;
+  height: 180px;
+  border-radius: 100%;
+
+  margin: 1rem 0 2rem;
+}
+
+
+
 /* Headers and Navigation */
 .bg-steel {
   background-color: var(--color-steel);
@@ -83,6 +191,7 @@ button:focus-visible {
 .site-header .navbar-nav .nav-link.active {
   font-weight: 600;
 }
+
 
 /* Content Sections */
 .content-section {
@@ -172,12 +281,6 @@ a.article-title:focus {
 }
 
 
-/* navbar */
-.navbar-img {
-  width: var(--navbar-img-size);
-  height: var(--navbar-img-size);
-  object-fit: cover;
-}
 
 
 
@@ -312,7 +415,9 @@ a.article-title:focus {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-/* Custom Modal Colors */
+
+
+
 .modal-header.bg-success {
   background-color: #4a7c5d !important;
 }
@@ -321,7 +426,6 @@ a.article-title:focus {
   background-color: #a85b5b !important;
 }
 
-/* Ensure modal header text stays white in both themes */
 .modal-header.bg-success .modal-title,
 .modal-header.bg-danger .modal-title {
   color: #ffffff !important;
