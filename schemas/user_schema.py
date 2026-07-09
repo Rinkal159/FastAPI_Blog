@@ -33,3 +33,10 @@ class UserResponse(Base):
 
     class Config:
         orm_mode = True
+        
+        
+class UserPassword(Base):
+    current_password: str
+    new_password: Annotated[str, Field(
+        min_length=8
+    )]
