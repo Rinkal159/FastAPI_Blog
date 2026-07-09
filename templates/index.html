@@ -1,10 +1,19 @@
 {% extends "layout.html" %}
 {% block body %}
+
+{% if search_title %}
+<div class="searched-div">
+  <span class="searched-query">{{search_title}}</span>
+  <button onclick="window.location.href = `/`" id="searchCancel" class="searched-cancel"><i class="fa-solid fa-xmark"></i></button>
+</div>
+{% endif %}
+
 {% if blogs|length == 0 %}
 <article class="py-3 px-4 mb-4 text-center">
   <h4>No blogs to show</h4>
 </article>
 {% else %}
+
 {% for blog in blogs %}
 <article class="content-section py-3 px-4 mb-4">
   <div class="d-flex align-items-start gap-4">
