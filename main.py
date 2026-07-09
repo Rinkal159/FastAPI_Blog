@@ -26,14 +26,14 @@ templates = Jinja2Templates(directory="templates")
 # get all the posts
 @app.get("/", include_in_schema=False, name="home")
 @app.get("/blogs", include_in_schema=False, name="blogs")
-async def home(request: Request, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Blog).order_by(Blog.updated_at.desc()))
+async def home(request: Request, db: AsyncSession = Depends(get_db), title: str = ""):
+    result = await db.execute(select(Blog).where(Blog.title.ilike(f"%{title}%")).order_by(Blog.updated_at.desc()))
     blogs = result.scalars().all()
     
     user = await user_in_response(request, db)
         
     return templates.TemplateResponse(
-        request, "index.html", {"blogs": blogs, "title": "Index", "user" : user}
+        request, "index.html", {"blogs": blogs, "title": "Index", "user" : user, "search_title" : title}
     )
 
 
@@ -84,7 +84,6 @@ async def get_individual_blogs(
 # register
 @app.get("/signup", include_in_schema=False)
 def signup(request: Request):
-    print("SIGNUP")
     return templates.TemplateResponse(request, "signup.html", {"title" : "Signup"})
 
 
@@ -92,6 +91,15 @@ def signup(request: Request):
 @app.get("/login", include_in_schema=False)
 def login(request: Request):
     return templates.TemplateResponse(request, "login.html", {"title" : "Login"})
+
+
+# profile
+@app.get("/profile", include_in_schema=False)
+async def profile(request: Request, db: AsyncSession=Depends(get_db)):
+    
+    user = await user_in_response(request, db)
+    
+    return templates.TemplateResponse(request, "profile.html", {"title" : "Profile", "user" : user})
 
 
 
