@@ -97,7 +97,7 @@ async def update_blog_api(
 
     if existed_post.author_id != current_user_id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to perform request action",
         )
 
@@ -127,7 +127,7 @@ async def delete_blog_api(
 
     if existed_post.author_id != current_user_id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to perform request action",
         )
 
