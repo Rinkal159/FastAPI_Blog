@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="profile">
+    <div class="displayProfile mb-5 profile-section-headings">
+        <h2 class="mb-3">Profile</h2>
+        <!-- name -->
+        <div class="mb-3 profile-fields">
+            <label for="name" class="form-label">Name</label>
+            <input disabled type="text" class="form-control profile-values" id="name" name="name" required minlength="4"
+                maxlength="100" autocomplete="off" value="{{user.name}}">
+        </div>
+
+        <!-- bio -->
+        <div class="mb-3 profile-fields">
+            <label for="bio" class="form-label">Bio</label>
+            <textarea disabled class="form-control profile-values" name="bio" id="bio" rows="4">{{user.bio}}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+
+    </div>
+
+    <hr>
+
+    <div class="password my-5">
+        <h2 class=" profile-section-headings">Edit Password</h2>
+        <form id="changePasswordForm">
+            <!-- Current password -->
+            <div class="mb-3">
+                <label for="password" class="form-label">Current Password<span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="currentPassword" name="currentPassword" required
+                    autocomplete="off">
+            </div>
+
+            <!-- new password -->
+            <div class="mb-3">
+                <label for="password" class="form-label">New Password<span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="newPassword" name="newPassword" required minlength="8"
+                    autocomplete="off">
+                <div class="form-text">Must be at least 8 characters.</div>
+            </div>
+
+
+            <!-- confirm password -->
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password<span
+                        class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required
+                    minlength="8" autocomplete="off">
+                <div id="passwordError" class="text-danger d-none pt-2">Passwords do not match.</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Change Password</button>
+        </form>
+    </div>
+
+    <hr>
+
+    <div class="delete-profile profile-section-headings">
+        <h2 class="mb-3">Delete Account</h2>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteUserModal">Delete</button>
+    </div>
+</div>
+
+
+<!-- Delete user modal -->
+<div class="modal fade" id="DeleteUserModal" tabindex="-1" aria-labelledby="DeleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger">
+                <h1 class="modal-title fs-5" id="DeleteUserModalLabel">Delete</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="DeleteUserModalBody">Are you sure you want to Delete your account?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="delete" type="button" class="btn btn-outline-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="module" src="/static/controllers/deleteUser.js"></script>
+<script type="module" src="/static/controllers/updatePassword.js"></script>
+{% endblock %}
