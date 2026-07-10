@@ -4,19 +4,17 @@
 <div class="profile">
     <div class="displayProfile mb-5 profile-section-headings">
         <h2 class="mb-3">Profile</h2>
-        <!-- name -->
-        <div class="mb-3 profile-fields">
-            <label for="name" class="form-label">Name</label>
-            <input disabled type="text" class="form-control profile-values" id="name" name="name" required minlength="4"
-                maxlength="100" autocomplete="off" value="{{user.name}}">
-        </div>
 
-        <!-- bio -->
-        <div class="mb-3 profile-fields">
-            <label for="bio" class="form-label">Bio</label>
-            <textarea disabled class="form-control profile-values" name="bio" id="bio" rows="4">{{user.bio}}</textarea>
+        <!-- profile picture -->
+        <div class="profile-picture-div">
+            <img class="img-preview" src="{{user.profile_picture_path}}" alt="Profile picture">
+            <div class="info">
+                <span>{{user.name}}</span>
+                <span class="email">{{user.email}}</span>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">Update Profile</button>
+        
+        <button onclick="window.location.href = `/profile/update`" type="button" class="btn btn-primary">Update Profile</button>
 
     </div>
 
