@@ -1,14 +1,15 @@
-from fastapi import FastAPI, Request, HTTPException, status, Depends
+from fastapi import FastAPI, Request, HTTPException, status, Depends, Query
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 from exception_handling.exception_handlers import handlers
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 from database import get_db
 from model import lifespan
 from auth.authentication import verify_token, get_current_user
 from utils.user_In_response import user_in_response
+from typing import Annotated
 
 from model import User, Blog
 from schemas.user_schema import UserCreate as UserCreateSchema
@@ -26,14 +27,30 @@ templates = Jinja2Templates(directory="templates")
 # get all the posts
 @app.get("/", include_in_schema=False, name="home")
 @app.get("/blogs", include_in_schema=False, name="blogs")
-async def home(request: Request, db: AsyncSession = Depends(get_db), title: str = ""):
-    result = await db.execute(select(Blog).where(Blog.title.ilike(f"%{title}%")).order_by(Blog.updated_at.desc()))
-    blogs = result.scalars().all()
+async def home(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
+    page: int = 1,
+    title: str = "",
+):
+    total_result = await db.execute(select(func.count()).select_from(Blog))
+    total = total_result.scalar() or 0
     
+    result = await db.execute(
+        select(Blog)
+        .where(Blog.title.ilike(f"%{title}%"))
+        .order_by(Blog.updated_at.desc())
+        .limit(limit)
+    )
+    blogs = result.scalars().all()
+
     user = await user_in_response(request, db)
-        
+
     return templates.TemplateResponse(
-        request, "index.html", {"blogs": blogs, "title": "Index", "user" : user, "search_title" : title}
+        request,
+        "index.html",
+        {"blogs": blogs, "title": "Index", "user": user, "search_title": title, "has_more" : len(blogs) < total},
     )
 
 
@@ -47,11 +64,13 @@ async def blog(id: int, request: Request, db: AsyncSession = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found"
         )
-        
+
     user = await user_in_response(request, db)
 
     return templates.TemplateResponse(
-        request, "blog.html", {"blog": existed_blog, "title": existed_blog.title[:50], "user" : user}
+        request,
+        "blog.html",
+        {"blog": existed_blog, "title": existed_blog.title[:50], "user": user},
     )
 
 
@@ -68,39 +87,47 @@ async def get_individual_blogs(
             status_code=status.HTTP_404_NOT_FOUND, detail="Author not found"
         )
 
-    result_blogs = await db.execute(select(Blog).where(Blog.author_id == id).order_by(Blog.updated_at.desc()))
+    result_blogs = await db.execute(
+        select(Blog).where(Blog.author_id == id).order_by(Blog.updated_at.desc())
+    )
     blogs = result_blogs.scalars().all()
-    
+
     user = await user_in_response(request, db)
 
     name = blogs[0].author.name
     return templates.TemplateResponse(
         request,
         "individual_blogs.html",
-        {"blogs": blogs, "name": name, "title": f"Posts by {name[:50]}", "user" : user},
+        {"blogs": blogs, "name": name, "title": f"Posts by {name[:50]}", "user": user},
     )
 
 
 # register
 @app.get("/signup", include_in_schema=False)
 def signup(request: Request):
-    return templates.TemplateResponse(request, "signup.html", {"title" : "Signup"})
+    return templates.TemplateResponse(request, "signup.html", {"title": "Signup"})
 
 
 # login
 @app.get("/login", include_in_schema=False)
 def login(request: Request):
-    return templates.TemplateResponse(request, "login.html", {"title" : "Login"})
+    return templates.TemplateResponse(request, "login.html", {"title": "Login"})
 
 
 # profile
 @app.get("/profile", include_in_schema=False)
-async def profile(request: Request, db: AsyncSession=Depends(get_db)):
-    
-    user = await user_in_response(request, db)
-    
-    return templates.TemplateResponse(request, "profile.html", {"title" : "Profile", "user" : user})
+async def profile(request: Request, current_user=Depends(get_current_user)):
+    return templates.TemplateResponse(
+        request, "profile.html", {"title": "Profile", "user": current_user}
+    )
 
+
+# update profile
+@app.get("/profile/update", include_in_schema=False)
+async def update_profile(request: Request, current_user=Depends(get_current_user)):
+    return templates.TemplateResponse(
+        request, "updateProfile.html", {"title": "Update Profile", "user": current_user}
+    )
 
 
 # * BACK-END
