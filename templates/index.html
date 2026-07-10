@@ -4,7 +4,8 @@
 {% if search_title %}
 <div class="searched-div">
   <span class="searched-query">{{search_title}}</span>
-  <button onclick="window.location.href = `/`" id="searchCancel" class="searched-cancel"><i class="fa-solid fa-xmark"></i></button>
+  <button onclick="window.location.href = `/`" id="searchCancel" class="searched-cancel"><i
+      class="fa-solid fa-xmark"></i></button>
 </div>
 {% endif %}
 
@@ -19,7 +20,7 @@
   <div class="d-flex align-items-start gap-4">
 
     <!-- profile picture -->
-    <img class="rounded-circle article-img flex-shrink-0" src="/{{blog.author.profile_picture_path}}"
+    <img class="rounded-circle article-img flex-shrink-0" src="{{blog.author.profile_picture_path}}"
       alt="{{ blog.author.name }}'s profile picture" width="64" height="64" loading="lazy">
 
 
@@ -43,5 +44,12 @@
   </div>
 </article>
 {% endfor %}
+
+{% if has_more %}
+<div class="loading-blogs-btn-div d-flex justify-content-center mb-5">
+  <button id="loadMoreBlogs" type="button" class="btn btn-primary">Load more blogs</button>
+</div>
+{% endif %}
+
 {% endif %}
 {% endblock %}
