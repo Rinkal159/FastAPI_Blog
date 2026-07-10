@@ -22,11 +22,10 @@ confirmPassword.addEventListener("keyup", () => {
 
 // live profile picture preview
 profilePicture.addEventListener("change", () => {
+    const pictureFile = profilePicture.files[0];
 
-    picture = profilePicture.files[0];
-
-    if (picture) {
-        previewImage.src = URL.createObjectURL(picture)
+    if (pictureFile) {
+        previewImage.src = URL.createObjectURL(pictureFile)
     }
 })
 
@@ -42,18 +41,10 @@ form.addEventListener("submit", async (e) => {
 
 
         const formData = new FormData(form)
-        const userData = {
-            name: formData.get("name"),
-            email: formData.get("email"),
-            password: formData.get("password"),
-        }
 
         const response = await fetch("/api/auth/signup", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(userData)
+            body: formData
         })
 
 
