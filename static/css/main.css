@@ -157,17 +157,29 @@ button:focus-visible {
   margin-bottom: 2rem;
 }
 
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+  font-size: 1.20rem;
+}
+
+.email {
+  color: var(--color-link-hover);
+}
+
 /* profile picture */
 .profile-picture-div {
   display: flex;
   gap: 1.5rem;
   align-items: center;
 }
+
 .img-preview {
   width: 180px;
   height: 180px;
   border-radius: 100%;
-
+  object-fit: cover;
   margin: 1rem 0 2rem;
 }
 
