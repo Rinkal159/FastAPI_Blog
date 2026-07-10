@@ -5,29 +5,30 @@
     <h2 class="mb-4">Signup</h2>
     <form id="signupForm" enctype="multipart/form-data">
 
+        <!-- profile picture -->
         <div class="profile-picture-div">
             <img id="previewImage" class="img-preview" src="{{url_for('static', path='/profile_pictures/default_user.jpg')}}" alt="Profile picture">
-            <input type="file" id="profilePicture" accept="image/*">
+            <input type="file" id="profilePicture" accept="image/*" name="profilePicture">
         </div>
 
         <!-- name -->
         <div class="mb-3">
             <label for="name" class="form-label">Name<span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="name" name="name" required minlength="4" maxlength="100" autocomplete="off">
+            <input type="text" class="form-control" id="name" name="name" required minlength="4" maxlength="100" autocomplete="off" value="shakiman">
         </div>
 
 
         <!-- email -->
         <div class="mb-3">
             <label for="email" class="form-label">Email<span class="text-danger">*</span></label>
-            <input type="email" class="form-control" id="email" name="email" required autocomplete="off">
+            <input type="email" class="form-control" id="email" name="email" required autocomplete="off" value="shaktiman@gmail.com">
         </div>
 
 
         <!-- password -->
         <div class="mb-3">
             <label for="password" class="form-label">Password<span class="text-danger">*</span></label>
-            <input type="password" class="form-control" id="password" name="password" required minlength="8" autocomplete="off">
+            <input type="password" class="form-control" id="password" name="password" required minlength="8" autocomplete="off" value="Shaktiman123">
             <div class="form-text">Must be at least 8 characters.</div>
         </div>
 
@@ -36,7 +37,7 @@
         <div class="mb-3">
             <label for="confirmPassword" class="form-label">Confirm Password<span class="text-danger">*</span></label>
             <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required
-                minlength="8" autocomplete="off">
+                minlength="8" autocomplete="off" value="Shaktiman123">
             <div id="passwordError" class="text-danger d-none pt-2">Passwords do not match.</div>
         </div>
 
