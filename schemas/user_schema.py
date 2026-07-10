@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, EmailStr
 from typing import Annotated
 from datetime import datetime
+from fastapi import Form
 
 
 class Base(BaseModel):
@@ -12,13 +13,38 @@ class UserCreate(Base):
     email: EmailStr
     password: Annotated[str, Field(min_length=8)]
     bio: Annotated[str | None, Field(max_length=1500)] = None
-    profile_picture: str | None = None
+    
+    @classmethod
+    def as_form(
+        cls, 
+        name: str = Form(...),
+        email: EmailStr = Form(...),
+        password: str = Form(...),
+        bio: str | None = Form(None),
+    ):
+        return cls(
+            name=name,
+            email=email,
+            password=password,
+            bio=bio
+        )
+    
     
     
 class UserUpdate(Base):
     name: str | None = None
     bio: str | None = None
-    profile_picture: str | None = None
+    
+    @classmethod
+    def as_form(
+        cls, 
+        name: str | None = Form(None),
+        bio: str | None = Form(None)
+    ):
+        return cls(
+            name=name,
+            bio=bio
+        )
 
 
 # inherited from UserCreate
