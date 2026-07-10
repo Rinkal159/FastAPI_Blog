@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="content-section py-3 px-4 mb-4">
+    <h2 class="mb-4">Update Profile</h2>
+    <form id="updateProfileForm" enctype="multipart/form-data">
+
+        <!-- profile picture -->
+        <div class="profile-picture-div">
+            <img id="previewImage" class="img-preview" src="{{user.profile_picture_path}}" alt="Profile picture">
+            <input type="file" id="profilePicture" accept="image/*" name="profilePicture">
+        </div>
+
+        <!-- name -->
+        <div class="mb-3">
+            <label for="name" class="form-label">Name<span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" name="name" required minlength="4" maxlength="100" autocomplete="off" value="{{user.name}}">
+        </div>
+
+
+        <!-- bio -->
+        <div class="mb-3">
+            <label for="bio" class="form-label">Bio</label>
+            <textarea class="form-control" name="bio" id="bio" rows="4">{{user.bio}}</textarea>
+        </div>
+        
+
+        <!-- submit button -->
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="module" src="/static/controllers/updateProfile.js"></script>
+{% endblock %}
