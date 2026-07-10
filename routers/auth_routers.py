@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from database import get_db
 from utils.password_hashing import hash_password, verify_password
+from utils.encrypt_profile_picture_name import encrypt
 from fastapi.security import OAuth2PasswordRequestForm
 from auth.authentication import create_token
 from fastapi.responses import JSONResponse, RedirectResponse
+from typing import Annotated
+import shutil
 
 from model import User
 from schemas.user_schema import (
@@ -22,10 +25,20 @@ auth_router = APIRouter(prefix="/api/auth", tags=["Auth"])
     response_model=UserResponseSchema,
     status_code=status.HTTP_201_CREATED,
 )
-async def create_user_api(user: UserCreateSchema, db: AsyncSession = Depends(get_db)):
-    user.email = user.email.lower()
+async def create_user_api(user: UserCreateSchema = Depends(UserCreateSchema.as_form), profilePicture: UploadFile | None = File(None), db: AsyncSession = Depends(get_db)):
+    user_dict = user.model_dump()
+
+    if profilePicture:
+        filename = encrypt(profilePicture.filename)
+        
+        with open(f"media/profile_pictures/{filename}", "wb") as buffer:
+            shutil.copyfileobj(profilePicture.file, buffer)
+            
+        user_dict["profile_picture"] = filename
+                    
+    user_dict["email"] = user.email.lower()
     
-    result = await db.execute(select(User).where(func.lower(User.email) == user.email))
+    result = await db.execute(select(User).where(func.lower(User.email) == user_dict["email"]))
     existed_user = result.scalars().one_or_none()
 
     # user already exists
@@ -35,8 +48,9 @@ async def create_user_api(user: UserCreateSchema, db: AsyncSession = Depends(get
             detail="Email already exists. PLease try again with different email.",
         )
 
-    user.password = hash_password(user.password)
-    new_user = User(**user.model_dump())
+    user_dict["password"] = hash_password(user.password)
+    
+    new_user = User(**user_dict)
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
