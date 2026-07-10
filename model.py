@@ -31,8 +31,8 @@ class User(Base):
     @property
     def profile_picture_path(self):
         if self.profile_picture:
-            return f"media/profic_pictures/{self.profile_picture}"
-        return "static/profile_pictures/default.jpg"
+            return f"/media/profile_pictures/{self.profile_picture}"
+        return "/static/profile_pictures/default_user.jpg"
 
 
 class Blog(Base):
