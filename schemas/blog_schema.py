@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Annotated
 from datetime import datetime
 
@@ -22,6 +22,8 @@ class AuthorDetail(Base):
     profile_picture: str | None
     profile_picture_path: str
     bio: str | None
+    
+    model_config = ConfigDict(from_attributes=True)
 
 
 # inheritated from BlogCreate
@@ -29,6 +31,13 @@ class BlogResponse(BlogCreate):
     posted_at: datetime
     updated_at: datetime
     author: AuthorDetail
-
-    class Config:
-        orm_mode = True
+    
+    model_config = ConfigDict(from_attributes=True)
+        
+        
+class PaginatedBlogResponse(Base):
+    blogs: list[BlogResponse]
+    page: int
+    skip: int
+    limit: int
+    has_more: bool
