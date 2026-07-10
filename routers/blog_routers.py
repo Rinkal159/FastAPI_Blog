@@ -1,44 +1,61 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Response
+from fastapi import APIRouter, HTTPException, status, Depends, Response, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from auth.authentication import get_current_user
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, func
+from typing import Annotated
 
 from model import Blog
 from schemas.blog_schema import (
     BlogCreate as BlogCreateSchema,
     BlogResponse as BlogResponseSchema,
     BlogUpdate as BlogUpdateSchema,
+    PaginatedBlogResponse as PaginatedBlogResponseSchema,
 )
 
 blog_router = APIRouter(prefix="/api/blogs", tags=["Blogs"])
 
 
 # * get all the blogs - pagination applied
-@blog_router.get("/", response_model=list[BlogResponseSchema])
+@blog_router.get("/", response_model=PaginatedBlogResponseSchema)
 async def get_blogs_api(
     db: AsyncSession = Depends(get_db),
-    current_user_id=Depends(get_current_user),
-    limit: int = 5,
+    current_user=Depends(get_current_user),
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
     page: int = 1,
     title: str = "",
     content: str = "",
 ):
+
+    total_result = await db.execute(select(func.count()).select_from(Blog))
+    total = total_result.scalar() or 0
+
+    skip = limit * (page - 1)
+
     result = await db.execute(
         select(Blog)
         .where(and_(Blog.title.ilike(f"%{title}%"), Blog.content.ilike(f"%{content}%")))
-        .offset(limit * (page - 1))
+        .order_by(Blog.posted_at.desc())
+        .offset(skip)
         .limit(limit)
     )
-    return result.scalars().all()
+
+    blogs = result.scalars().all()
+    return PaginatedBlogResponseSchema(
+        blogs=[BlogResponseSchema.model_validate(blog) for blog in blogs],
+        page=page,
+        skip=skip,
+        limit=limit,
+        has_more=skip + len(blogs) < total,
+    )
 
 
 # * get all your blogs
 @blog_router.get("/individual", response_model=list[BlogResponseSchema])
 async def get_blogs_individual_api(
-    db: AsyncSession = Depends(get_db), current_user_id=Depends(get_current_user)
+    db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)
 ):
-    result = await db.execute(select(Blog).where(Blog.author_id == current_user_id))
+    result = await db.execute(select(Blog).where(Blog.author_id == current_user.id))
     return result.scalars().all()
 
 
@@ -47,7 +64,7 @@ async def get_blogs_individual_api(
 async def get_blog_api(
     blog_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user_id=Depends(get_current_user),
+    current_user=Depends(get_current_user),
 ):
     result = await db.execute(select(Blog).where(Blog.id == blog_id))
     existed_blog = result.scalars().one_or_none()
@@ -67,10 +84,10 @@ async def get_blog_api(
 async def create_post_api(
     blog: BlogCreateSchema,
     db: AsyncSession = Depends(get_db),
-    current_user_id=Depends(get_current_user),
+    current_user=Depends(get_current_user),
 ):
     blog_dict = blog.model_dump()
-    blog_dict["author_id"] = current_user_id
+    blog_dict["author_id"] = current_user.id
     new_blog = Blog(**blog_dict)
 
     db.add(new_blog)
@@ -85,7 +102,7 @@ async def update_blog_api(
     post_id: int,
     post: BlogUpdateSchema,
     db: AsyncSession = Depends(get_db),
-    current_user_id=Depends(get_current_user),
+    current_user=Depends(get_current_user),
 ):
     result = await db.execute(select(Blog).where(Blog.id == post_id))
     existed_post = result.scalars().one_or_none()
@@ -95,7 +112,7 @@ async def update_blog_api(
             status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found"
         )
 
-    if existed_post.author_id != current_user_id:
+    if existed_post.author_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to perform request action",
@@ -115,7 +132,7 @@ async def update_blog_api(
 async def delete_blog_api(
     post_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user_id=Depends(get_current_user),
+    current_user=Depends(get_current_user),
 ):
     result = await db.execute(select(Blog).where(Blog.id == post_id))
     existed_post = result.scalars().one_or_none()
@@ -125,7 +142,7 @@ async def delete_blog_api(
             status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found"
         )
 
-    if existed_post.author_id != current_user_id:
+    if existed_post.author_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to perform request action",
