@@ -4,3 +4,4 @@ env_config.py
 *__pycache__
 *__init__.py
 *settings.json
+/media
