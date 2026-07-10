@@ -1,8 +1,12 @@
 from jose import jwt, JWTError, ExpiredSignatureError
 from datetime import datetime, UTC, timedelta
 from env_config import settings
-from fastapi import status, Cookie
+from fastapi import status, Cookie, Depends
 from utils.exception import raise_exception
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from database import get_db
+from model import User
 
 
 def create_token(data: dict) -> str :
@@ -32,8 +36,15 @@ def verify_token(token: str) -> int :
     
     return user_id
 
-def get_current_user(access_token: str | None = Cookie(None)):
+async def get_current_user(access_token: str | None = Cookie(None), db: AsyncSession = Depends(get_db)):
     if access_token is None:
             raise raise_exception(status.HTTP_401_UNAUTHORIZED, "Session is expired. Please log in again.")
         
-    return verify_token(access_token)
+    user_id = verify_token(access_token)
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalars().one_or_none()
+    
+    if not user:
+        raise raise_exception(status.HTTP_404_NOT_FOUND, "User not found")
+    
+    return user
